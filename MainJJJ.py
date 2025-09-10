@@ -358,64 +358,7 @@ def costfunction(addedvalue):
     index #1                    -------> surface
     index #X                    -------> top of atmosphere
     """
-    def calculatetheta_v(temperature,watervapor,cloudhydro,pressure):
-        Rd=287.0
-        cp=1004.0
-        kappa=Rd/cp
-        theta_v=(temperature*(100000.0/pressure)**kappa)*\
-                (1+0.61*0.622*watervapor*1e-6-cloudhydro)
-        return theta_v
-
-    theta_vo=calculatetheta_v(era5_temperature_interpolated,\
-                              era5_watervaporppmv_interpolated,\
-                              era5_cloudwater_interpolated+era5_cloudice_interpolated,\
-                              era5_pressure_interpolated)
-    
-    theta_v=calculatetheta_v(era5_temperature_interpolated+\
-                             addedvalue[:nlevel],\
-                             era5_watervaporppmv_interpolated+\
-                             addedvalue[nlevel:2*nlevel]*1e3,\
-                             era5_cloudwater_interpolated+era5_cloudice_interpolated,\
-                             era5_pressure_interpolated+\
-                             addedvalue[2*nlevel:]*100.0)
-    
-    atm_state={'T':era5_temperature_interpolated+addedvalue[:nlevel],\
-               'p':era5_pressure_interpolated+addedvalue[2*nlevel:]*100.0,\
-               'rho':calculaterho(era5_temperature_interpolated+addedvalue[:nlevel],\
-                                  era5_pressure_interpolated+addedvalue[2*nlevel:]*100.0,\
-                                  era5_watervaporppmv_interpolated+addedvalue[nlevel:2*nlevel]*1e3),\
-               'qv':0.622*(era5_watervaporppmv_interpolated+addedvalue[nlevel:2*nlevel]*1e3)*1e-6,\
-               'qc':era5_cloudwater_interpolated+\
-                    era5_cloudice_interpolated,\
-               'qr':era5_cloudrain_interpolated+\
-                    era5_cloudsnow_interpolated}
-    cloudmp_cfg=WSM3Config()
-    cloudmp_dt=1
-    for n in range(120):
-        wsm3_step(atm_state,cloudmp_dt,cloudmp_cfg)
-
-    simulate_bt_analysis,_,_,_=HATPOR(gmwr_observation[obs_date]["station_latitude"],\
-                                      gmwr_observation[obs_date]["station_longitude"],\
-                                      gmwr_observation[obs_date]["station_elevation"]/1000.0,\
-                                      gmwr_observation[obs_date]["2m_pressure"],\
-                                      gmwr_observation[obs_date]["2m_temperature"],\
-                                      np.array(era5_temperature_interpolated+\
-                                               addedvalue[:nlevel],\
-                                               order="F")[::-1],\
-                                      np.array(era5_pressure_interpolated+\
-                                               addedvalue[2*nlevel:]*100.0,\
-                                               order="F")[::-1],\
-                                      np.array(era5_watervaporppmv_interpolated+\
-                                               addedvalue[nlevel:2*nlevel]*1e3,\
-                                               order="F")[::-1],\
-                                      np.array(atm_state["qc"]+\
-                                               atm_state["qr"],\
-                                               order="F")[::-1])
-    
-    a=np.sum((simulate_bt_analysis/synthetic_bt-1)**2)
-    
-    b=np.sum((theta_vo/theta_v-1)**2)
-    return a+b
+    # please contact zhangqi@cnhyc.com for this section
 
 # set perturbation for temperature, water vapor, pressure
 addedvalue=np.zeros(nlevel*3)
